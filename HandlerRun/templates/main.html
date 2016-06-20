@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>接口测试工具</title>
+    <!-- Bootstrap -->
+    <link href="{{static_url('css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{static_url('css/bootstrap-theme.min.css')}}" rel="stylesheet">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{{static_url('js/jquery-2.0.0.min.js')}}"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+
+
+</head>
+<body onload="iFrameHeightForMain()">
+<div id="view" style="padding-top: 40px;background-color: #ffffff;">
+    <div class="row" style="margin:0 auto;
+        border:1px solid #999;position:relative;" id="main">
+        <form id="apiRequest" action="/api/check/main" method="post">
+            <div style="padding:20px;">
+                <div class="panel-heading" style="background-color: #eeeeee;
+                border: 1px solid #999">
+                    <h4 class="text-info">
+                        输入接口url&nbsp;&nbsp;
+                        <select id="method" name="method">
+                            <option value="get">GET</option>
+                            <option value="post">POST</option>
+                            <option value="put">PUT</option>
+                            <option value="delete">DELETE</option>
+                        </select>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="submit" class="btn btn-info" value="请求">
+                    </h4>
+                    <input type="text" class="form-control" id="url"
+                       name="url" placeholder="接口url" >
+                </div>
+            </div>
+            <div style="padding-top:5px;padding-right:20px;padding-left:20px;">
+                <div style="background-color: #eeeeee;
+                border: 1px solid #999;padding: 10px">
+                    <b><p>Content-Type:  application/json</p></b>
+                    <textarea class="form-control" name="data" rows="6" id="data"></textarea>
+                </div>
+            </div>
+        </form>
+        {% if result.get('content') %}
+        <div style="padding-top:5px;padding-right:20px;padding-left:20px;">
+            <div style="background-color: #eeeeee;
+            border: 1px solid #999;padding-left: 20px">
+                <h4 class="text-info">
+                    {{result.get('method')}}&nbsp;&nbsp;{{result.get('url')}}
+                </h4>
+            </div>
+        </div>
+
+        <div style="height: 100%;padding-top:10px;padding-left:20px;padding-right: 20px">
+            <div style="background-color: #eeeeee;padding-top: 5px;
+            border: 1px solid #999; height: 52%;padding-right:50px;overflow:auto">
+                <ul style=";padding-right: 10px;height: 300px">
+                    <li>
+                        <b>
+                            HTTP&nbsp;&nbsp;
+                            <span class="text-info">
+                                {{result.get('statusCode')}}
+                            </span>
+                        </b>
+                    </li>
+                    <li>
+                        <b>
+                            Content-Type:&nbsp;
+                            <span class="text-info">
+                                {{result.get('contentType')}}
+                            </span>
+                        </b>
+                    </li>
+                    <li>
+                        <b>
+                        {% for data in result.get('content') %}
+                            {% if data.get('type') == 'dictStr' %}
+                                <span style="padding-left: {{data.get('padding')}}px" class="text-danger">{{data.get('key')}}:&nbsp;&nbsp;</span>
+                                <span class="{{data.get('valueClass')}}">{{data.get('value')}}</span><br>
+                            {% elif data.get('type') == 'listStr' %}
+                                <span style="padding-left: {{data.get('padding')}}px" class="{{data.get('valueClass')}}">{{data.get('value')}}</span><br>
+                            {% elif data.get('type') in ['dict','list'] %}
+                                <span style="padding-left: {{data.get('padding')}}px" class="text-danger">{{data.get('key')}}:&nbsp;&nbsp;</span><br>
+                            {% else %}
+                                <span style="padding-left: {{data.get('padding')}}px" class="text-warning">{{data.get('value')}}</span><br>
+                            {% end %}
+                        {% end %}
+                        </b>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% end %}
+    </div>
+</div>
+
+</body>
+</html>
+<script>
+    function iFrameHeightForMain() {
+        var main= document.getElementById("main");
+        var mianWidth = window.screen.width*0.7;
+        var mianHeight = window.screen.height - 200;
+        main.style.height = mianHeight +'px' ;
+        main.style.width = (mianWidth) +'px' ;
+    }
+
+    function AjaxPost(url,data){
+        var aj = $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            datatype: "json",
+            async: true, //是否异步
+            cache: false,
+            success: function (datas) {
+                if (datas["ret"]=='success') {
+                    alert('ok')
+                }else{
+                    alert(datas["msg"])
+                }
+            },
+            error: function () {
+                alert('异常');
+            }
+        });
+    }
+
+function MakeList(result){
+    for(var temp in result){
+        result[temp]
+    }
+}
+</script>
